@@ -96,8 +96,8 @@ A single wget call is dangerous. A wget piped into sh is critical. Chains matter
 ## Quickstart with Docker
 
 ```bash
-git clone https://github.com/your-username/vaaman
-cd vaaman
+git clone https://github.com/tusharsharma4444/vaaman-cli
+cd vaaman-cli
 docker build -t vaaman .
 docker run -it vaaman bash
 ```
@@ -115,8 +115,8 @@ vaaman install <package-name> --no-block
 ## Local setup (Linux)
 
 ```bash
-git clone https://github.com/your-username/vaaman
-cd vaaman
+git clone https://github.com/tusharsharma4444/vaaman-cli
+cd vaaman-cli
 npm install
 npm run build
 npm link
