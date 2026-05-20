@@ -5,7 +5,7 @@ import { spawn, execSync } from 'child_process';
 import { StraceMonitor } from './monitor/strace.js';
 import { NetworkMonitor } from './monitor/network.js';
 import { FilesystemMonitor } from './monitor/filesystem.js';
-import { Reasoner } from './ai/reasoner.js';
+import { Reasoner } from './reasoner/reasoner.js';
 import { printInstallStart, printInstallEnd, printLiveEvent, printLiveSignal, printBlocked, printWarning, } from './reporter.js';
 function isLinux() {
     return process.platform === 'linux';

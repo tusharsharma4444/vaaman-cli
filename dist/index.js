@@ -5,12 +5,49 @@
 import { Command } from 'commander';
 import * as path from 'path';
 import { runInstall } from './runner.js';
+import { preScan } from './prescan/index.js';
+import { printPreScanSummary } from './prescan/index.js';
 import { printHeader, printReport, printError, printWarning, } from './reporter.js';
 const program = new Command();
 program
     .name('vaaman')
     .description('AI-native supply chain security — watches npm install for backdoor activity')
     .version('0.1.0');
+// Existing pre-scan command
+program
+    .command('pre-scan <package>')
+    .description('Run pre-scan on a package without installing')
+    .action(async (packageName, opts) => {
+    try {
+        const result = await preScan({
+            packageName,
+            version: opts.version,
+        });
+        printPreScanSummary(result);
+    }
+    catch (err) {
+        console.error('Pre-scan failed:', err);
+        process.exit(1);
+    }
+});
+// Alias command 'prescan' for convenience
+program
+    .command('prescan <package>')
+    .description('Alias for pre-scan')
+    .action(async (packageName, opts) => {
+    // Reuse the same handler as pre-scan
+    try {
+        const result = await preScan({
+            packageName,
+            version: opts.version,
+        });
+        printPreScanSummary(result);
+    }
+    catch (err) {
+        console.error('Pre-scan failed:', err);
+        process.exit(1);
+    }
+});
 program
     .command('install [packages...]')
     .description('Run npm install with live behavioral monitoring')
