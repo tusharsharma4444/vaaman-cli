@@ -6,7 +6,7 @@
 
 import * as acorn from 'acorn';
 import type { Node, CallExpression, MemberExpression, Identifier, Literal } from 'acorn';
-import type { PrimitiveHit, RiskLevel, TarballEntry } from './types.js';
+import type { PrimitiveHit, RiskLevel, TarballEntry } from './types';
 
 // ── Primitive Detection Rules ──────────────────
 
@@ -93,18 +93,20 @@ const PRIMITIVE_RULES: PrimitiveRule[] = [
       ((node as CallExpression).callee as Identifier).name === 'fetch',
   },
 
-  // process.env access
+  // process.env.SOMETHING — direct access pattern
   {
     label: 'process.env',
     risk: 'suspicious',
     match: (node) => {
+      // Match: process.env (MemberExpression where object=process, property=env)
       if (node.type !== 'MemberExpression') return false;
       const member = node as MemberExpression;
-      return (
-        member.object.type === 'MemberExpression' &&
-        ((member.object as MemberExpression).object as Identifier)?.name === 'process' &&
-        ((member.object as MemberExpression).property as Identifier)?.name === 'env'
-      );
+      const obj = member.object;
+      if (obj.type !== 'Identifier') return false;
+      if ((obj as Identifier).name !== 'process') return false;
+      const prop = member.property;
+      if (prop.type !== 'Identifier') return false;
+      return (prop as Identifier).name === 'env';
     },
   },
 
@@ -222,6 +224,25 @@ function scanFileSource(filePath: string, source: string): PrimitiveHit[] {
 
 const JS_EXTENSIONS = new Set(['.js', '.cjs', '.mjs']);
 
+// ── File-Level Suppression ────────────────────
+// Even after path suppression in extractor, some framework internals
+// slip through via non-standard paths. Suppress by filename pattern.
+
+const SUPPRESSED_FILE_PATTERNS = [
+  /webpack[._-]/i,          // webpack runtime/chunks
+  /rollup[._-]/i,           // rollup bundles
+  /chunk\.\w+\.js$/i,       // generic chunk files (e.g. chunk.abc123.js)
+  /\d+\.js$/,               // numbered chunks (e.g. 1444.js, 2212.js) — build output
+  /vendor\./i,              // vendor bundles
+  /polyfill/i,              // polyfill files
+  /runtime\./i,             // runtime files
+];
+
+function isSuppressedFile(filePath: string): boolean {
+  const filename = filePath.split('/').pop() ?? filePath;
+  return SUPPRESSED_FILE_PATTERNS.some((pattern) => pattern.test(filename));
+}
+
 /**
  * Scans all JS files extracted from a tarball.
  * Skips .ts, .json (handled elsewhere), minified files.
@@ -232,6 +253,9 @@ export function scanTarballEntries(entries: TarballEntry[]): PrimitiveHit[] {
   for (const entry of entries) {
     const ext = getExtension(entry.path);
     if (!JS_EXTENSIONS.has(ext)) continue;
+
+    // Skip build artifacts and framework chunks — high noise, low signal
+    if (isSuppressedFile(entry.path)) continue;
 
     // Skip likely minified files — they produce massive false positives
     if (isLikelyMinified(entry.content)) continue;

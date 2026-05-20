@@ -7,7 +7,7 @@
 import { createGunzip } from 'zlib';
 import { Readable } from 'stream';
 import { extract } from 'tar-stream';
-import type { TarballEntry } from './types.js';
+import type { TarballEntry } from './types';
 
 // Files we care about scanning
 const SCANNABLE_EXTENSIONS = new Set(['.js', '.cjs', '.mjs', '.ts', '.json']);
@@ -17,6 +17,33 @@ const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
 // Max total entries to extract — guard against malicious tarballs with thousands of files
 const MAX_ENTRIES = 2000;
+
+// ── Path Suppression ──────────────────────────
+// These path segments indicate bundled deps or build output inside the tarball.
+// They are NOT the package's own source code — scanning them produces noise.
+
+const SUPPRESSED_PATH_SEGMENTS = [
+  'node_modules/',          // bundled dependencies inside the tarball
+  '.next-cli-build/',       // next.js build output
+  '.next/',                 // next.js build output
+  'dist/',                  // pre-built output — not source
+  'build/',                 // pre-built output
+  '.cache/',                // build caches
+  '__tests__/',             // test files
+  'test/',                  // test files
+  'tests/',                 // test files
+  '.nyc_output/',           // coverage output
+  'coverage/',              // coverage output
+];
+
+/**
+ * Returns true if this path should be skipped entirely.
+ * Catches bundled node_modules, build artifacts, and test files
+ * that live inside the tarball but aren't the package's own code.
+ */
+function isSuppressedPath(filePath: string): boolean {
+  return SUPPRESSED_PATH_SEGMENTS.some((segment) => filePath.includes(segment));
+}
 
 /**
  * Extracts a .tgz buffer in memory.
@@ -47,8 +74,9 @@ export async function extractTarball(tarballBuffer: Buffer): Promise<TarballEntr
       const ext = getExtension(filePath);
       const isDirectory = header.type === 'directory';
       const isTooLarge = (header.size ?? 0) > MAX_FILE_SIZE_BYTES;
+      const isSuppressed = isSuppressedPath(filePath);
 
-      if (isDirectory || !SCANNABLE_EXTENSIONS.has(ext) || isTooLarge) {
+      if (isDirectory || !SCANNABLE_EXTENSIONS.has(ext) || isTooLarge || isSuppressed) {
         stream.resume(); // drain stream without reading
         return next();
       }

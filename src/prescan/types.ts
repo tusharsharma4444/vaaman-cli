@@ -34,6 +34,7 @@ export interface PreScanResult {
   filesScanned: number;
   lifecycleScripts: LifecycleScript[];
   primitiveHits: PrimitiveHit[];
+  chains: import('./chain-detector').DetectedChain[];  // correlated behavioral chains
   recommendation: Recommendation;
   scanDurationMs: number;
   error?: string;               // set if scan failed partially
