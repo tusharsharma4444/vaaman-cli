@@ -1,0 +1,22 @@
+{
+  "name": "@vaaman/trust-engine",
+  "version": "0.1.0",
+  "description": "AI-native Trust Engine — multi-dimensional trust scoring for npm packages",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@vaaman/core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@vaaman/core",
+  "version": "0.1.0",
+  "description": "Shared types, OpenRouter AI client, and core utilities for Vaaman AI",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./types": "./dist/types/index.js",
+    "./ai": "./dist/ai/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0"
+  }
+}

@@ -2,15 +2,11 @@ node_modules
 dist
 *.tsbuildinfo
 .git
-README.md
+.gitignore
 docs
 .env
 .env.local
 .vaaman
 apps/api/data
-apps/dashboard/dist
 .vscode
 .idea
-data/
-*.log
-*.txt

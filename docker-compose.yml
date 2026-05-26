@@ -1,0 +1,41 @@
+# ─────────────────────────────────────────────
+# Vaaman AI — Security-Hardened Docker Compose
+# Single container: API + CLI + Dashboard (port 3001)
+# Hardened for public deployment
+# ─────────────────────────────────────────────
+
+services:
+  vaaman:
+    build: .
+    container_name: vaaman
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    volumes:
+      - vaaman_data:/app/apps/api/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_PTRACE       # strace needs ptrace capability
+      - NET_RAW           # network monitoring needs raw sockets
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=256M
+      - /app/apps/api/data:rw,noexec,nosuid,size=10M
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  vaaman_data:

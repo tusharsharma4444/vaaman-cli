@@ -1,0 +1,22 @@
+{
+  "name": "@vaaman/deep-intel",
+  "version": "0.1.0",
+  "description": "AI-native Deep Intel filter — contextual intent classification for supply chain security",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@vaaman/core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0"
+  }
+}

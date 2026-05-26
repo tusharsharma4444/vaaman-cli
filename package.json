@@ -1,28 +1,23 @@
 {
-  "name": "vaaman",
-  "version": "0.1.0",
-  "description": "AI-native supply chain security — watches npm install in real time",
-  "type": "module",
-  "bin": {
-    "vaaman": "./dist/index.js"
-  },
+  "name": "vaaman-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsx src/index.ts",
-    "pre-scan": "tsx src/prescan/index.ts",
-    "start": "node dist/index.js"
-  },
-  "dependencies": {
-    "chalk": "^5.3.0",
-    "ora": "^8.0.1",
-    "commander": "^12.0.0",
-    "acorn": "^8.11.3",
-    "tar-stream": "^3.1.7"
+    "build": "npm run build -w packages/core && npm run build -w packages/deep-intel && npm run build -w packages/trust-engine && npm run build -w apps/api && npm run build -w apps/cli && npm run build -w apps/dashboard",
+    "build:no-dashboard": "npm run build -w packages/core && npm run build -w packages/deep-intel && npm run build -w packages/trust-engine && npm run build -w apps/api && npm run build -w apps/cli",
+    "dev": "npm run dev -w apps/api & npm run dev -w apps/dashboard",
+    "dev:api": "npm run dev -w apps/api",
+    "dev:dashboard": "npm run dev -w apps/dashboard",
+    "dev:cli": "npm run dev -w apps/cli",
+    "clean": "rimraf apps/*/dist packages/*/dist",
+    "pre-scan": "npm run pre-scan -w apps/cli",
+    "test": "echo \"No tests yet\""
   },
   "devDependencies": {
-    "typescript": "^5.4.0",
-    "tsx": "^4.7.0",
-    "@types/node": "^20.0.0",
-    "@types/tar-stream": "^3.1.3"
+    "rimraf": "^5.0.0",
+    "typescript": "^5.4.0"
   }
 }
