@@ -1,0 +1,12 @@
+node_modules
+dist
+*.tsbuildinfo
+.git
+.gitignore
+docs
+.env
+.env.local
+.vaaman
+apps/api/data
+.vscode
+.idea

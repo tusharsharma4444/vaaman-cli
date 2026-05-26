@@ -1,0 +1,16 @@
+node_modules
+dist
+*.tsbuildinfo
+.git
+README.md
+docs
+.env
+.env.local
+.vaaman
+apps/api/data
+apps/dashboard/dist
+.vscode
+.idea
+data/
+*.log
+*.txt
